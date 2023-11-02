@@ -83,7 +83,7 @@ classdef pplane < handle
             %   n --> number of arrows in each axis
             % Outputs : Nothing
 
-            % check isocline status :
+            % check isoclines show status :
             if ismember(varargin,'ShowIsoclines')
                 ShowIsoclines = true;
             else
@@ -163,8 +163,8 @@ classdef pplane < handle
             EndPoint = [obj.sol.States(end,1),obj.sol.States(end,2)];
             plot(gca,StartPoint(1),StartPoint(2),'ro',...
                 'MarkerFaceColor','r')
-            plot(gca,EndPoint(1),EndPoint(2),'ko',...
-                'MarkerFaceColor','k')
+            plot(gca,EndPoint(1),EndPoint(2),'go',...
+                'MarkerFaceColor','g')
             hold off
         end % end of plotPhaseTraj method
     end % end of public methods
