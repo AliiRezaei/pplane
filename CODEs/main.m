@@ -13,7 +13,7 @@ xLim = [-3 3];                   % x axis limit
 yLim = [-3 3];                   % y axis limit
 pp = pplane(sys,t,x0,xLim,yLim); % pplane object
 
-%% Phase-Plane Analysis and PLots
+%% Phase-Plane Analysis and Plots
 
 figure
 pp.plotPhaseTraj();
