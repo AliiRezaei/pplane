@@ -4,8 +4,7 @@ close all
 
 %% Define System
 
-epsilon = .1;
-sys = @(t,x) [x(2); -x(1)+epsilon*(x(2)-x(2)^3/3)]; % rayliegh's equation
+sys = @(t,x) [x(1)-x(1)*x(2); x(1)+x(2)];
 dt = 0.01;                       % time step
 SimTime = 50;                    % simulation time
 t = (0:dt:SimTime)';             % time span
@@ -19,8 +18,7 @@ pp = pplane(sys,t,x0,xLim,yLim); % pplane object
 figure
 pp.plotPhaseTraj();
 hold on
-pp.isocline(10);
-% pp.plotQuiver(10);
+pp.isocline(10,'ShowIsoclines');
 xlabel('$x_{1}$','Interpreter','latex','FontSize',14);
 ylabel('$x_{2}$','Interpreter','latex','FontSize',14);
 title('$Phase Plane$','Interpreter','latex','FontSize',14);
