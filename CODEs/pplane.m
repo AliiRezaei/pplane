@@ -19,6 +19,7 @@ classdef pplane < handle
         sol = struct('States',[],'Time',[]);
         x_lim;
         y_lim;
+        solver = 'RK4' % default equation solver;
     end % end of public properties
 
     properties(GetAccess = private , SetAccess = private)
@@ -73,8 +74,15 @@ classdef pplane < handle
 
             nt = numel(obj.tspan); % number of element of t
             dt = round(max(obj.tspan) - min(obj.tspan)) / nt; % time resolution
-            [T,X] = obj.RK4(obj.tspan,dt,obj.InitCond); % solve system equation using RK4
-        end % end of solveSys method
+            
+            if strcmp(obj.solver,'euler')
+                % solve system equation using euler forward method
+                [T,X] = obj.eulerMethod(obj.tspan,dt,obj.InitCond);
+            elseif strcmp(obj.solver,'RK4')
+                % solve system equation using RK4
+                [T,X] = obj.eulerMethod(obj.tspan,dt,obj.InitCond);
+            end % end if
+            end % end of solveSys method
 
         function isocline(obj,n,varargin)
             % This method is the implementation of the isocline method ...
@@ -109,7 +117,8 @@ classdef pplane < handle
                         slope = atan2(f(2),f(1)) * 180 / pi;
                     end
                     obj.plotArrow(i,j,slope,'Color','r', ...
-                        'HorizontalAlignment','Center');
+                        'HorizontalAlignment','Center', ...
+                        'FontSize',12);
                     if ShowIsoclines
                         slope = tan(slope * pi / 180); % degree to radian
                         % solve f(2) = alpha * f(1) :
@@ -166,6 +175,8 @@ classdef pplane < handle
             plot(gca,EndPoint(1),EndPoint(2),'go',...
                 'MarkerFaceColor','g')
             hold off
+            xlim(obj.x_lim)
+            ylim(obj.y_lim)
         end % end of plotPhaseTraj method
     end % end of public methods
 
@@ -176,7 +187,7 @@ classdef pplane < handle
             % Inputs:
             %     tSpan --> time span for the ODE solve
             %     dt    --> time resolution
-            %     x0    --> initial condition
+            %     Y0    --> initial condition
             %
             % Outputs:
             %     T --> simulation time
@@ -204,6 +215,35 @@ classdef pplane < handle
             % transpose to make this and ODE45 look alike
             Y = transpose(Y);
         end % end of RK4 method
+
+        function [t,x] = eulerMethod(obj,tSpan,dt,x0)
+            % This method is the Implementation of the euler forward Method
+            % for the Numeric Solve of Differetial Equations...
+            % Inputs:
+            %     tSpan --> time span for the ODE solve
+            %     dt    --> time resolution
+            %     x0    --> initial condition
+            %
+            % Outputs:
+            %     T --> simulation time
+            %     x --> ODE numerical solution
+            
+            StepNum  = floor((max(tSpan) - min(tSpan)) / dt) + 1;    % number of simulation steps
+            StateNum = numel(x0);                                    % number of sys states
+            odeFun = obj.sys; % ode function
+
+            % initialize solution and time vars
+            x = zeros(StateNum, StepNum);
+            t = (min(tSpan) : dt : max(tSpan))';
+            x(:, 1) = x0;
+            
+            % main loop
+            for i = 1:StepNum - 1
+                x(:,i+1) = x(:,i) + dt * feval(odeFun, t(i), x(:, i));
+            end
+            % transpose to make this and ODE45 look alike
+            x = transpose(x);
+        end % end of eulerMethod method
 
         function plotArrow(~,x,y,deg,varargin)
             % This method plot vector feild arrows
